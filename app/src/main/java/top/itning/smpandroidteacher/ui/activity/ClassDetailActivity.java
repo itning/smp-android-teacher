@@ -1,5 +1,7 @@
 package top.itning.smpandroidteacher.ui.activity;
 
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -16,10 +18,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -31,10 +35,15 @@ import top.itning.smpandroidteacher.R;
 import top.itning.smpandroidteacher.R2;
 import top.itning.smpandroidteacher.client.ClassClient;
 import top.itning.smpandroidteacher.client.http.HttpHelper;
+import top.itning.smpandroidteacher.client.http.Page;
 import top.itning.smpandroidteacher.entity.LeaveDTO;
+import top.itning.smpandroidteacher.entity.StudentClassCheckMetaData;
 import top.itning.smpandroidteacher.entity.StudentClassDTO;
 import top.itning.smpandroidteacher.entity.StudentClassUser;
+import top.itning.smpandroidteacher.ui.adapter.StudentClassCheckMetaDataRecyclerViewAdapter;
 import top.itning.smpandroidteacher.ui.adapter.StudentClassUserRecyclerViewAdapter;
+import top.itning.smpandroidteacher.ui.listener.AbstractLoadMoreListener;
+import top.itning.smpandroidteacher.util.PageUtils;
 
 import static top.itning.smpandroidteacher.util.DateUtils.ZONE_ID;
 
@@ -62,6 +71,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
     private StudentClassDTO studentClassDto;
     private List<LeaveDTO> leaveDtoList;
     private Disposable leaveDisposable;
+    private Page<StudentClassCheckMetaData> studentClassCheckMetaDataPage;
+    private List<StudentClassCheckMetaData> studentClassCheckMetaDataList;
+    private Disposable allStudentCheckMetaDataDisposable;
 
 
     @Override
@@ -131,18 +143,84 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
 
     @Override
     public void onBackPressed() {
+        if (rv != null) {
+            rv.clearOnScrollListeners();
+        }
         if (leaveDisposable != null && !leaveDisposable.isDisposed()) {
             leaveDisposable.dispose();
+        }
+        if (allStudentCheckMetaDataDisposable != null && !allStudentCheckMetaDataDisposable.isDisposed()) {
+            allStudentCheckMetaDataDisposable.dispose();
         }
         super.onBackPressed();
     }
 
     public void onShadowClick(View v) {
-        Log.d(TAG, "aa");
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        @SuppressLint("InflateParams") View classCheckMetaDataView = getLayoutInflater().inflate(R.layout.alert_leave_reason, null);
+        RecyclerView classCheckMetaRecyclerView = classCheckMetaDataView.findViewById(R.id.recycler_view);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        classCheckMetaRecyclerView.setLayoutManager(layoutManager);
+        studentClassCheckMetaDataList = new ArrayList<>();
+        classCheckMetaRecyclerView.setAdapter(new StudentClassCheckMetaDataRecyclerViewAdapter(studentClassCheckMetaDataList, this, this::onMetaDataClick));
+        classCheckMetaRecyclerView.clearOnScrollListeners();
+        classCheckMetaRecyclerView.addOnScrollListener(new AbstractLoadMoreListener() {
+            @Override
+            protected void onLoading(int countItem, int lastItem) {
+                PageUtils.getNextPageAndSize(studentClassCheckMetaDataPage, t -> initStudentClassCheckMetaData(false, t.getT1(), t.getT2(), classCheckMetaRecyclerView));
+            }
+        });
+        initStudentClassCheckMetaData(true, PageUtils.DEFAULT_PAGE, PageUtils.DEFAULT_SIZE, classCheckMetaRecyclerView);
+
+        bottomSheetDialog.setContentView(classCheckMetaDataView);
+        bottomSheetDialog.show();
+    }
+
+    @SuppressWarnings("deprecation")
+    private void initStudentClassCheckMetaData(boolean clear,
+                                               @Nullable Integer page,
+                                               @Nullable Integer size,
+                                               RecyclerView classCheckMetaRecyclerView) {
+        assert studentClassDto != null;
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("加载中");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        allStudentCheckMetaDataDisposable = HttpHelper.get(ClassClient.class)
+                .getAllStudentClassCheckMetaData(studentClassDto.getId(), page, size)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pageRestModel -> {
+                    if (pageRestModel.getData().getContent() == null) {
+                        progressDialog.dismiss();
+                        return;
+                    }
+                    if (clear) {
+                        studentClassCheckMetaDataList.clear();
+                    }
+                    studentClassCheckMetaDataPage = pageRestModel.getData();
+                    studentClassCheckMetaDataList.addAll(pageRestModel.getData().getContent());
+                    if (classCheckMetaRecyclerView.getAdapter() != null) {
+                        classCheckMetaRecyclerView.getAdapter().notifyDataSetChanged();
+                    }
+                    progressDialog.dismiss();
+                }, HttpHelper.ErrorInvoke.get(this)
+                        .before(t -> progressDialog.dismiss())
+                        .orElseException(t -> {
+                            Log.w(TAG, "网络请求错误", t);
+                            Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                        }));
+
     }
 
     @Override
     public void onItemClick(View view, StudentClassUser object) {
         Log.d(TAG, object.toString());
+    }
+
+    private void onMetaDataClick(View view, StudentClassCheckMetaData studentClassCheckMetaData) {
+
     }
 }

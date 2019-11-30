@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import io.reactivex.Observable;
-import retrofit2.http.Field;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import top.itning.smpandroidteacher.client.http.Page;
 import top.itning.smpandroidteacher.client.http.RestModel;
@@ -36,7 +36,7 @@ public interface ClassClient {
      * @return 所有签到元数据
      */
     @GET("/class/student_class_check_meta_data/{studentClassId}")
-    Observable<RestModel<Page<StudentClassCheckMetaData>>> getAllStudentClassCheckMetaData(@Field("studentClassId") String studentClassId, @Query("page") Integer page, @Query("size") Integer size);
+    Observable<RestModel<Page<StudentClassCheckMetaData>>> getAllStudentClassCheckMetaData(@Path("studentClassId") String studentClassId, @Query("page") Integer page, @Query("size") Integer size);
 
     /**
      * 获取班级请假信息
