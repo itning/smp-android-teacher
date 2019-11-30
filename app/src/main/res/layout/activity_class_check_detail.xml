@@ -12,10 +12,9 @@
         android:id="@+id/tb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        toolbar:title="班级详情" />
+        toolbar:title="签到详情" />
 
     <com.loopeer.shadow.ShadowView
-        android:onClick="onShadowClick"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="0dp"
@@ -40,7 +39,7 @@
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_class_name"
+                    android:id="@+id/tv_class_c1"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:autoSizeMaxTextSize="18dp"
@@ -48,10 +47,10 @@
                     android:autoSizeTextType="uniform"
                     android:maxLines="1"
                     android:textColor="#fff"
-                    tool:text="数学1603班级" />
+                    tool:text="应签：14人" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/tv_class_num"
+                    android:id="@+id/tv_class_c2"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:autoSizeMaxTextSize="18dp"
@@ -59,7 +58,7 @@
                     android:autoSizeTextType="uniform"
                     android:maxLines="1"
                     android:textColor="#fff"
-                    tool:text="16AS530" />
+                    tool:text="实签：2人" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/tv_class_leave"
@@ -70,7 +69,7 @@
                     android:autoSizeTextType="uniform"
                     android:maxLines="1"
                     android:textColor="#fff"
-                    tool:text="请假2人" />
+                    tool:text="请假：2人" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <TextView
@@ -82,7 +81,7 @@
                 android:textColor="#fff"
                 android:textSize="23sp"
                 android:textStyle="bold"
-                tool:text="50人" />
+                tool:text="16人" />
         </RelativeLayout>
     </com.loopeer.shadow.ShadowView>
 
@@ -91,9 +90,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/srl"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>

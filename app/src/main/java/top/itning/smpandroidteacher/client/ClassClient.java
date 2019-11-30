@@ -10,6 +10,7 @@ import retrofit2.http.Query;
 import top.itning.smpandroidteacher.client.http.Page;
 import top.itning.smpandroidteacher.client.http.RestModel;
 import top.itning.smpandroidteacher.entity.LeaveDTO;
+import top.itning.smpandroidteacher.entity.StudentClassCheckDTO;
 import top.itning.smpandroidteacher.entity.StudentClassCheckMetaData;
 import top.itning.smpandroidteacher.entity.StudentClassDTO;
 
@@ -47,4 +48,13 @@ public interface ClassClient {
      */
     @GET("/class/student_class_leave")
     Observable<RestModel<List<LeaveDTO>>> getStudentClassLeave(@Query("studentClassId") String studentClassId, @Query("whereDay") LocalDate whereDay);
+
+    /**
+     * 根据签到元数据获取该班级的签到信息
+     *
+     * @param studentClassCheckMetaDataId 元数据ID
+     * @return 该班级的签到信息
+     */
+    @GET("/class/check/{studentClassCheckMetaDataId}")
+    Observable<RestModel<List<StudentClassCheckDTO>>> check(@Path("studentClassCheckMetaDataId") String studentClassCheckMetaDataId);
 }

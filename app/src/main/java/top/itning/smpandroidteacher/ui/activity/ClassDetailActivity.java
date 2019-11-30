@@ -2,6 +2,7 @@ package top.itning.smpandroidteacher.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -221,6 +222,8 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
     }
 
     private void onMetaDataClick(View view, StudentClassCheckMetaData studentClassCheckMetaData) {
-
+        Intent intent = new Intent(this, ClassCheckDetailActivity.class);
+        intent.putExtra("data", studentClassCheckMetaData);
+        startActivity(intent);
     }
 }
