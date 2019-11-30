@@ -29,7 +29,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="150dp"
             android:padding="16dp">
 
             <androidx.appcompat.widget.LinearLayoutCompat
@@ -70,6 +70,22 @@
                     android:maxLines="1"
                     android:textColor="#fff"
                     tool:text="请假：2人" />
+
+                <TextView
+                    android:id="@+id/tv_class_start"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="#fff"
+                    tool:text="开始时间：2019.11.27 14:32:32" />
+
+                <TextView
+                    android:id="@+id/tv_class_end"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="#fff"
+                    tool:text="结束时间：2019.11.27 14:32:32" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <TextView

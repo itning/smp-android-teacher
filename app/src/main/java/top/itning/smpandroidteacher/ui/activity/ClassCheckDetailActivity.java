@@ -60,11 +60,16 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
     AppCompatTextView classLeave;
     @BindView(R2.id.tv_count)
     TextView count;
+    @BindView(R2.id.tv_class_start)
+    TextView classStart;
+    @BindView(R2.id.tv_class_end)
+    TextView classEnd;
 
     @Nullable
     private StudentClassCheckMetaData studentClassCheckMetaData;
     private List<StudentClassCheckDTO> studentClassCheckDtoList;
     private Disposable checkDisposable;
+    private Disposable classLeaveDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +91,13 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
     }
 
     private void initInfo() {
+        assert studentClassCheckMetaData != null;
         class1.setText("应签：数据加载中...");
         class2.setText("实签：数据加载中...");
         classLeave.setText("请假：数据加载中...");
         count.setText("N/A");
+        classStart.setText(MessageFormat.format("开始时间：{0}", DateUtils.format(studentClassCheckMetaData.getStartTime(), DateUtils.YYYYMMDDHHMMSS_DATE_TIME_FORMATTER_1)));
+        classEnd.setText(MessageFormat.format("结束时间：{0}", DateUtils.format(studentClassCheckMetaData.getEndTime(), DateUtils.YYYYMMDDHHMMSS_DATE_TIME_FORMATTER_1)));
     }
 
     private void initRecyclerView() {
@@ -131,7 +139,7 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
     }
 
     private void setInfo(StudentClassCheckMetaData studentClassCheckMetaData, List<StudentClassCheckDTO> data) {
-        Disposable disposable = HttpHelper.get(ClassClient.class)
+        classLeaveDisposable = HttpHelper.get(ClassClient.class)
                 .getStudentClassLeave(studentClassCheckMetaData.getStudentClass().getId(), LocalDateTime.ofInstant(studentClassCheckMetaData.getGmtCreate().toInstant(), DateUtils.ZONE_ID).toLocalDate())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -178,6 +186,9 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (checkDisposable != null && !checkDisposable.isDisposed()) {
             checkDisposable.dispose();
+        }
+        if (classLeaveDisposable != null && !classLeaveDisposable.isDisposed()) {
+            classLeaveDisposable.dispose();
         }
         super.onBackPressed();
     }
