@@ -15,7 +15,6 @@
         toolbar:title="班级详情" />
 
     <com.loopeer.shadow.ShadowView
-        android:onClick="onShadowClick"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="0dp"
@@ -95,5 +94,16 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="10dp"
+            android:onClick="onCheckClick"
+            android:src="@drawable/outline_track_changes_white_48"
+            app:backgroundTint="@color/colorAccent"
+            app:layout_behavior="top.itning.smpandroidteacher.ui.view.FabListBehavior" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>

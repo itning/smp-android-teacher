@@ -156,7 +156,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         super.onBackPressed();
     }
 
-    public void onShadowClick(View v) {
+    public void onCheckClick(View v) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         @SuppressLint("InflateParams") View classCheckMetaDataView = getLayoutInflater().inflate(R.layout.alert_leave_reason, null);
         RecyclerView classCheckMetaRecyclerView = classCheckMetaDataView.findViewById(R.id.recycler_view);
