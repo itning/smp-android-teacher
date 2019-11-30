@@ -233,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
 
     @Override
     public void onItemClick(View view, StudentClassDTO object) {
-
+        Intent intent = new Intent(this, ClassDetailActivity.class);
+        intent.putExtra("data", object);
+        startActivity(intent);
     }
 }

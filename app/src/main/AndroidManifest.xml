@@ -40,7 +40,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.PersonalActivity"></activity>
+        <activity android:name=".ui.activity.ClassDetailActivity"></activity>
+        <activity android:name=".ui.activity.PersonalActivity" />
         <activity
             android:name=".ui.activity.LoginActivity"
             android:screenOrientation="portrait" />

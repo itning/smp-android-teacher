@@ -1,5 +1,6 @@
 package top.itning.smpandroidteacher.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import lombok.Data;
  * @author itning
  */
 @Data
-public class StudentClassDTO {
+public class StudentClassDTO implements Serializable {
     /**
      * ID
      */

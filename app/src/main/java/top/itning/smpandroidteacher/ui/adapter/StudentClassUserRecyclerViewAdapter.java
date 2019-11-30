@@ -12,30 +12,29 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import top.itning.smpandroidteacher.R;
-import top.itning.smpandroidteacher.entity.StudentClassDTO;
+import top.itning.smpandroidteacher.entity.StudentClassUser;
 import top.itning.smpandroidteacher.ui.view.RoundBackChange;
 import top.itning.smpandroidteacher.util.DateUtils;
 
 /**
  * @author itning
  */
-public class StudentClassRecyclerViewAdapter extends RecyclerView.Adapter<StudentClassRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
+public class StudentClassUserRecyclerViewAdapter extends RecyclerView.Adapter<StudentClassUserRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
     @NonNull
-    private final List<StudentClassDTO> studentClassDtoList;
+    private final List<StudentClassUser> studentClassUserList;
     @NonNull
     private final Context context;
     @Nullable
-    private final OnItemClickListener<StudentClassDTO> onItemClickListener;
+    private final OnItemClickListener<StudentClassUser> onItemClickListener;
     private final List<Integer> colorList = new ArrayList<>(7);
     private int nexIndex;
 
-    public StudentClassRecyclerViewAdapter(@NonNull List<StudentClassDTO> studentClassDtoList, @NonNull Context context, @Nullable OnItemClickListener<StudentClassDTO> onItemClickListener) {
-        this.studentClassDtoList = studentClassDtoList;
+    public StudentClassUserRecyclerViewAdapter(@NonNull List<StudentClassUser> studentClassUserList, @NonNull Context context, @Nullable OnItemClickListener<StudentClassUser> onItemClickListener) {
+        this.studentClassUserList = studentClassUserList;
         this.context = context;
         this.onItemClickListener = onItemClickListener;
         initColorArray();
@@ -44,30 +43,30 @@ public class StudentClassRecyclerViewAdapter extends RecyclerView.Adapter<Studen
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_student_class, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_student_class_user, parent, false);
         view.setOnClickListener(this);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        StudentClassDTO studentClassDTO = studentClassDtoList.get(position);
-        holder.itemView.setTag(studentClassDTO);
-        holder.createTime.setText(DateUtils.format(studentClassDTO.getGmtCreate(), DateUtils.YYYYMMDDHHMM_DATE_TIME_FORMATTER_2));
-        holder.className.setText(studentClassDTO.getName());
-        holder.peopleCount.setText(MessageFormat.format("{0}人", studentClassDTO.getStudentClassUserList().size()));
+        StudentClassUser studentClassUser = studentClassUserList.get(position);
+        holder.itemView.setTag(studentClassUser);
+        holder.name.setText(studentClassUser.getUser().getName());
+        holder.studentNum.setText(studentClassUser.getUser().getStudentUser().getStudentId());
+        holder.joinTime.setText(DateUtils.format(studentClassUser.getGmtCreate(), DateUtils.YYYYMMDDHHMM_DATE_TIME_FORMATTER_2));
         holder.roundBackChange.setBackColor(getNextColor());
     }
 
     @Override
     public int getItemCount() {
-        return studentClassDtoList.size();
+        return studentClassUserList.size();
     }
 
     @Override
     public void onClick(View v) {
         if (onItemClickListener != null) {
-            onItemClickListener.onItemClick(v, (StudentClassDTO) v.getTag());
+            onItemClickListener.onItemClick(v, (StudentClassUser) v.getTag());
         }
     }
 
@@ -83,9 +82,9 @@ public class StudentClassRecyclerViewAdapter extends RecyclerView.Adapter<Studen
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private TextView className;
-        private TextView createTime;
-        private TextView peopleCount;
+        private TextView name;
+        private TextView studentNum;
+        private TextView joinTime;
         private RoundBackChange roundBackChange;
 
 
@@ -95,9 +94,9 @@ public class StudentClassRecyclerViewAdapter extends RecyclerView.Adapter<Studen
         }
 
         private void set(View itemView) {
-            this.className = itemView.findViewById(R.id.tv_class);
-            this.createTime = itemView.findViewById(R.id.tv_create_time);
-            this.peopleCount = itemView.findViewById(R.id.tv_people);
+            this.name = itemView.findViewById(R.id.tv_name);
+            this.studentNum = itemView.findViewById(R.id.tv_student_num);
+            this.joinTime = itemView.findViewById(R.id.tv_join_time);
             this.roundBackChange = itemView.findViewById(R.id.round);
         }
     }
