@@ -62,11 +62,19 @@ import static top.itning.smpandroidteacher.util.DateUtils.MMDDHHMME_DATE_TIME_FO
 import static top.itning.smpandroidteacher.util.DateUtils.ZONE_ID;
 
 /**
+ * 主活动
+ *
  * @author itning
  */
 public class MainActivity extends AppCompatActivity implements StudentClassRecyclerViewAdapter.OnItemClickListener<StudentClassDTO> {
     private static final String TAG = "MainActivity";
+    /**
+     * 应用设置界面请求码
+     */
     private static final int SETTING_REQUEST_CODE = 104;
+    /**
+     * 必须权限申请请求码
+     */
     private static final int MUST_PERMISSIONS_REQUEST_CODE = 100;
     @BindView(R2.id.tv_hello)
     TextView helloTextView;
@@ -78,13 +86,28 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
     CoordinatorLayout coordinatorLayout;
     @BindView(R2.id.recycler_view)
     RecyclerView rv;
+    /**
+     * 资源
+     */
     @Nullable
     private Disposable titleDisposable;
+    /**
+     * 资源
+     */
     @Nullable
     private Disposable recyclerViewDataDisposable;
-    private List<StudentClassDTO> studentClassDtoList;
-    private Page<StudentClassDTO> studentClassDtoPage;
+    /**
+     * 资源
+     */
     private Disposable createClassDisposable;
+    /**
+     * 学生班级DTO集合
+     */
+    private List<StudentClassDTO> studentClassDtoList;
+    /**
+     * 学生班级分页数据
+     */
+    private Page<StudentClassDTO> studentClassDtoPage;
 
 
     @Override
@@ -96,12 +119,18 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
         initView();
     }
 
+    /**
+     * 初始化视图
+     */
     private void initView() {
         initTitleView();
         initSwipeRefreshLayout();
         initRecyclerView();
     }
 
+    /**
+     * 初始化标题
+     */
     private void initTitleView() {
         final SharedPreferences preferences = getSharedPreferences(App.SHARED_PREFERENCES_OWN, Context.MODE_PRIVATE);
         titleDisposable = Observable
@@ -116,6 +145,9 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
                 }, throwable -> Log.e(TAG, "title view error", throwable));
     }
 
+    /**
+     * 初始化下拉刷新
+     */
     private void initSwipeRefreshLayout() {
         swipeRefreshLayout.setColorSchemeResources(
                 R.color.colorPrimary, R.color.colorAccent, R.color.class_color_1,
@@ -125,6 +157,9 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
         swipeRefreshLayout.setOnRefreshListener(() -> initRecyclerViewData(true, PageUtils.DEFAULT_PAGE, PageUtils.DEFAULT_SIZE));
     }
 
+    /**
+     * 初始化RecyclerView
+     */
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(layoutManager);
@@ -140,6 +175,13 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
         initRecyclerViewData(true, PageUtils.DEFAULT_PAGE, PageUtils.DEFAULT_SIZE);
     }
 
+    /**
+     * 初始化RecyclerView数据
+     *
+     * @param clear 是否清空集合
+     * @param page  分页
+     * @param size  每页数量
+     */
     private void initRecyclerViewData(boolean clear, @Nullable Integer page, @Nullable Integer size) {
         swipeRefreshLayout.setRefreshing(true);
         recyclerViewDataDisposable = HttpHelper.get(ClassClient.class)
@@ -169,13 +211,23 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
 
     }
 
-    public void onShadowClick(View view) {
+    /**
+     * 个人中心按钮点击事件处理
+     *
+     * @param view View
+     */
+    public void onPersonalClick(View view) {
         if (view.getId() == R.id.btn_personal) {
             startActivity(new Intent(this, PersonalActivity.class));
         }
     }
 
-    public void onFabClick(View view) {
+    /**
+     * 创建班级按钮点击事件处理
+     *
+     * @param view View
+     */
+    public void onCreateClassClick(View view) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         @SuppressLint("InflateParams") View newClassView = getLayoutInflater().inflate(R.layout.alert_new_class, null);
         TextInputLayout textInputLayout = newClassView.findViewById(R.id.ti_layout);
@@ -218,6 +270,12 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
         bottomSheetDialog.show();
     }
 
+    /**
+     * 创建班级
+     *
+     * @param className         班名
+     * @param bottomSheetDialog BottomSheetDialog
+     */
     @SuppressWarnings("deprecation")
     private void doCreateClass(String className, BottomSheetDialog bottomSheetDialog) {
         ProgressDialog progressDialog = new ProgressDialog(this);

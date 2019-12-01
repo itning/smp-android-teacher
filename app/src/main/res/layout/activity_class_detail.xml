@@ -100,7 +100,7 @@
             android:layout_weight="1"
             android:elevation="10dp"
             android:foreground="?attr/selectableItemBackground"
-            android:onClick="onCheckClick"
+            android:onClick="onCheckHistoryClick"
             app:backgroundColor="@color/class_color_3"
             app:cornerRadius="4dp"
             app:shadowColor="@color/class_color_3"
@@ -112,7 +112,7 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="44dp"
                 android:gravity="center"
-                android:text="签到历史"
+                android:text="@string/class_detail_left_btn_str"
                 android:textColor="#fff" />
         </com.loopeer.shadow.ShadowView>
 
@@ -135,7 +135,7 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="44dp"
                 android:gravity="center"
-                android:text="发起签到"
+                android:text="@string/class_detail_right_btn_str"
                 android:textColor="#fff" />
         </com.loopeer.shadow.ShadowView>
     </androidx.appcompat.widget.LinearLayoutCompat>

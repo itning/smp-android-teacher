@@ -5,6 +5,6 @@
     tools:context="top.itning.smpandroid.ui.activity.ClassCheckActivity">
     <item
         android:id="@+id/item_del_class"
-        android:title="解散班级"
+        android:title="@string/menu_del_class_str"
         app:showAsAction="never" />
 </menu>

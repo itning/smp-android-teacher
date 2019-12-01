@@ -10,12 +10,23 @@ import top.itning.smpandroidteacher.client.http.HttpHelper;
 
 
 /**
+ * 应用实例
+ *
  * @author itning
  */
 public class App extends Application {
+    /**
+     * shared_preferences xml name
+     */
     public static final String SHARED_PREFERENCES_OWN = "smp_teacher_data";
+    /**
+     * 当B Activity销毁时是否刷新A中数据
+     */
     public static boolean needRefreshData = false;
 
+    /**
+     * shared_preferences 实例
+     */
     @Nullable
     public static SharedPreferences smpDataSharedPreferences;
 

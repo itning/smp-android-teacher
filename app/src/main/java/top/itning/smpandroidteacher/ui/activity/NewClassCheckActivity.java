@@ -37,15 +37,37 @@ import top.itning.smpandroidteacher.entity.StudentClassDTO;
 import static top.itning.smpandroidteacher.util.DateUtils.ZONE_ID;
 
 /**
+ * 新签到
+ *
  * @author itning
  */
 public class NewClassCheckActivity extends AppCompatActivity {
     private static final String TAG = "NewClassCheckActivity";
+    /**
+     * 数字格式化
+     */
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.000");
+    /**
+     * 高德地图客户端实例
+     */
     private AMapLocationClient locationClient = null;
+    /**
+     * 经度
+     */
     private double longitude = 0;
+    /**
+     * 纬度
+     */
     private double latitude = 0;
+    /**
+     * 学生班级DTO
+     */
     private StudentClassDTO studentClassDto;
+    /**
+     * 资源
+     */
+    private Disposable disposable;
+
     @BindView(R2.id.tb)
     MaterialToolbar toolbar;
     @BindView(R2.id.tv_address)
@@ -58,7 +80,7 @@ public class NewClassCheckActivity extends AppCompatActivity {
     AppCompatSpinner timeSpinner;
     @BindView(R2.id.spinner_m)
     AppCompatSpinner mSpinner;
-    private Disposable disposable;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +91,9 @@ public class NewClassCheckActivity extends AppCompatActivity {
         initView();
     }
 
+    /**
+     * 初始化视图
+     */
     private void initView() {
         initToolBar();
         if (studentClassDto == null) {
@@ -79,6 +104,9 @@ public class NewClassCheckActivity extends AppCompatActivity {
         initInfo();
     }
 
+    /**
+     * 初始化信息
+     */
     private void initInfo() {
         final float[] m = {5f};
         final int[] time = {3};
@@ -164,6 +192,9 @@ public class NewClassCheckActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 初始化地理信息
+     */
     private void initLocation() {
         AMapLocationClient.setApiKey("9da9e9d79cc99c0b7e11e1e69f93e495");
         locationClient = new AMapLocationClient(getApplicationContext());
@@ -227,6 +258,9 @@ public class NewClassCheckActivity extends AppCompatActivity {
         locationClient.startLocation();
     }
 
+    /**
+     * 初始化工具栏
+     */
     private void initToolBar() {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();

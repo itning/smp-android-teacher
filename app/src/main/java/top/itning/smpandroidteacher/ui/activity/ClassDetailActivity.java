@@ -50,6 +50,8 @@ import top.itning.smpandroidteacher.util.PageUtils;
 import static top.itning.smpandroidteacher.util.DateUtils.ZONE_ID;
 
 /**
+ * 班级详情
+ *
  * @author itning
  */
 public class ClassDetailActivity extends AppCompatActivity implements StudentClassUserRecyclerViewAdapter.OnItemClickListener<StudentClassUser>, MenuItem.OnMenuItemClickListener {
@@ -69,12 +71,30 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
     CoordinatorLayout coordinatorLayout;
     @BindView(R2.id.recycler_view)
     RecyclerView rv;
+    /**
+     * 学生班级DTO 从启动Activity获取的
+     */
     @Nullable
     private StudentClassDTO studentClassDto;
+    /**
+     * 资源
+     */
     private Disposable leaveDisposable;
+    /**
+     * 当前页码信息
+     */
     private Page<StudentClassCheckMetaData> studentClassCheckMetaDataPage;
+    /**
+     * 学生打卡元数据集合
+     */
     private List<StudentClassCheckMetaData> studentClassCheckMetaDataList;
+    /**
+     * 资源
+     */
     private Disposable allStudentCheckMetaDataDisposable;
+    /**
+     * 资源
+     */
     private Disposable delClassDisposable;
 
 
@@ -87,6 +107,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         initView();
     }
 
+    /**
+     * 初始化视图
+     */
     private void initView() {
         initToolBar();
         if (studentClassDto == null) {
@@ -97,6 +120,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         initRecyclerView();
     }
 
+    /**
+     * 初始化班级信息
+     */
     private void initClassInfo() {
         assert studentClassDto != null;
         classNameTextView.setText(MessageFormat.format("班名：{0}", studentClassDto.getName()));
@@ -115,6 +141,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
                         }));
     }
 
+    /**
+     * 初始化RecyclerView
+     */
     private void initRecyclerView() {
         assert studentClassDto != null;
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -122,6 +151,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         rv.setAdapter(new StudentClassUserRecyclerViewAdapter(studentClassDto.getStudentClassUserList(), this, this));
     }
 
+    /**
+     * 初始化工具栏
+     */
     private void initToolBar() {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -158,7 +190,12 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         super.onBackPressed();
     }
 
-    public void onCheckClick(View v) {
+    /**
+     * 签到历史按钮点击事件处理
+     *
+     * @param v View
+     */
+    public void onCheckHistoryClick(View v) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         @SuppressLint("InflateParams") View classCheckMetaDataView = getLayoutInflater().inflate(R.layout.alert_leave_reason, null);
         RecyclerView classCheckMetaRecyclerView = classCheckMetaDataView.findViewById(R.id.recycler_view);
@@ -180,6 +217,11 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         bottomSheetDialog.show();
     }
 
+    /**
+     * 发起签到按钮点击事件处理
+     *
+     * @param v View
+     */
     public void onNewClassCheckClick(View v) {
         if (studentClassDto == null) {
             return;
@@ -189,6 +231,14 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         startActivity(intent);
     }
 
+    /**
+     * 初始化学生课堂签到元数据
+     *
+     * @param clear                      是否清空集合
+     * @param page                       页数
+     * @param size                       每页数量
+     * @param classCheckMetaRecyclerView RecyclerView
+     */
     @SuppressWarnings("deprecation")
     private void initStudentClassCheckMetaData(boolean clear,
                                                @Nullable Integer page,

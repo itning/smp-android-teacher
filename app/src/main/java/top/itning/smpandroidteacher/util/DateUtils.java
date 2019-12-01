@@ -29,6 +29,12 @@ public class DateUtils {
     public static final DateTimeFormatter YYYYMMDDHHMMSS_DATE_TIME_FORMATTER_8 = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
     public static final DateTimeFormatter HHMM_DATE_TIME_FORMATTER_9 = DateTimeFormatter.ofPattern("HH:mm");
 
+    /**
+     * 问候信息
+     *
+     * @param suffix 后置
+     * @return 问候信息
+     */
     public static String helloTime(@Nullable String suffix) {
         if (suffix == null) {
             suffix = "";
@@ -50,6 +56,13 @@ public class DateUtils {
         }
     }
 
+    /**
+     * 格式化日期
+     *
+     * @param date              Date
+     * @param dateTimeFormatter DateTimeFormatter
+     * @return 日期字符串
+     */
     public static String format(Date date, DateTimeFormatter dateTimeFormatter) {
         return LocalDateTime.ofInstant(date.toInstant(), ZONE_ID).format(dateTimeFormatter);
     }

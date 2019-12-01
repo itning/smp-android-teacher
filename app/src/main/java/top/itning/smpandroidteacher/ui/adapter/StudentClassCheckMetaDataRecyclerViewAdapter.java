@@ -25,11 +25,11 @@ import top.itning.smpandroidteacher.util.DateUtils;
  */
 public class StudentClassCheckMetaDataRecyclerViewAdapter extends RecyclerView.Adapter<StudentClassCheckMetaDataRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
     @NonNull
-    private List<StudentClassCheckMetaData> studentClassCheckMetaDataList;
+    private final List<StudentClassCheckMetaData> studentClassCheckMetaDataList;
     @NonNull
-    private Context context;
+    private final Context context;
     @Nullable
-    private OnItemClickListener<StudentClassCheckMetaData> onItemClickListener;
+    private final OnItemClickListener<StudentClassCheckMetaData> onItemClickListener;
     private final List<Integer> colorList = new ArrayList<>(7);
     private int nexIndex;
 

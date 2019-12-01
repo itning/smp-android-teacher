@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:text="班级名称："
+            android:text="@string/new_class_name"
             android:textColor="#000"
             android:textSize="16sp" />
 
@@ -47,7 +47,7 @@
             android:layout_below="@id/tv_class_name_info"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:text="持续时间："
+            android:text="@string/new_class_time"
             android:textColor="#000"
             android:textSize="16sp" />
 
@@ -67,7 +67,7 @@
             android:layout_below="@id/spinner_time"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:text="最大距离："
+            android:text="@string/new_class_max_m"
             android:textColor="#000"
             android:textSize="16sp" />
 
@@ -81,13 +81,12 @@
             android:entries="@array/class_check_m" />
 
         <TextView
-            android:id="@+id/tv_location_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_max_m_info"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:text="当前位置："
+            android:text="@string/new_class_location"
             android:textColor="#000"
             android:textSize="16sp" />
 
@@ -99,7 +98,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_toEndOf="@id/tv_time_info"
-            android:text="定位中"
+            android:text="@string/new_class_location_waiting"
             android:textColor="#000"
             android:textSize="16sp" />
     </RelativeLayout>
@@ -115,7 +114,7 @@
         android:paddingTop="16dp"
         android:paddingEnd="32dp"
         android:paddingBottom="16dp"
-        android:text="发起签到"
+        android:text="@string/new_class_do_btn_str"
         android:textAppearance="?android:attr/textAppearanceLargeInverse"
         android:textSize="16sp"
         android:theme="@style/AppTheme" />

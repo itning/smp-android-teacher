@@ -15,12 +15,14 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_hello"
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginBottom="16dp"
+            android:autoSizeTextType="uniform"
+            android:maxLines="1"
             android:textColor="#000"
             android:textSize="20sp"
             tools:text="下午好，舒露" />
@@ -52,7 +54,7 @@
             android:layout_weight="1"
             android:elevation="10dp"
             android:foreground="?attr/selectableItemBackground"
-            android:onClick="onFabClick"
+            android:onClick="onCreateClassClick"
             android:padding="10dp"
             app:backgroundColor="#FD872A"
             app:cornerRadius="4dp"
@@ -65,7 +67,7 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="44dp"
                 android:gravity="center"
-                android:text="创建班级"
+                android:text="@string/main_create_class_str"
                 android:textColor="#fff" />
         </com.loopeer.shadow.ShadowView>
 
@@ -77,7 +79,7 @@
             android:layout_weight="1"
             android:elevation="10dp"
             android:foreground="?attr/selectableItemBackground"
-            android:onClick="onShadowClick"
+            android:onClick="onPersonalClick"
             android:padding="10dp"
             app:backgroundColor="#653EF8"
             app:cornerRadius="4dp"
@@ -90,7 +92,7 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="44dp"
                 android:gravity="center"
-                android:text="个人中心"
+                android:text="@string/main_personal_str"
                 android:textColor="#fff" />
         </com.loopeer.shadow.ShadowView>
     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -99,7 +101,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="我创建的班级"
+        android:text="@string/main_title"
         android:textColor="#000"
         android:textSize="20sp" />
 

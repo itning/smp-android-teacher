@@ -39,6 +39,8 @@ import top.itning.smpandroidteacher.ui.adapter.StudentClassCheckRecyclerViewAdap
 import top.itning.smpandroidteacher.util.DateUtils;
 
 /**
+ * 班级打卡详情
+ *
  * @author itning
  */
 public class ClassCheckDetailActivity extends AppCompatActivity {
@@ -65,10 +67,22 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
     @BindView(R2.id.tv_class_end)
     TextView classEnd;
 
+    /**
+     * 从启动者获取的学生班级打卡元数据
+     */
     @Nullable
     private StudentClassCheckMetaData studentClassCheckMetaData;
+    /**
+     * 学生打卡DTO集合
+     */
     private List<StudentClassCheckDTO> studentClassCheckDtoList;
+    /**
+     * 资源
+     */
     private Disposable checkDisposable;
+    /**
+     * 资源
+     */
     private Disposable classLeaveDisposable;
 
     @Override
@@ -80,6 +94,10 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
         initView();
     }
 
+    /**
+     * 初始化视图
+     * 当studentClassCheckMetaData为空时无需初始化
+     */
     private void initView() {
         initToolBar();
         if (studentClassCheckMetaData == null) {
@@ -91,6 +109,9 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
         initRecyclerView();
     }
 
+    /**
+     * 初始化信息
+     */
     private void initInfo() {
         assert studentClassCheckMetaData != null;
         class1.setText("应签：数据加载中...");
@@ -101,6 +122,9 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
         classEnd.setText(MessageFormat.format("结束时间：{0}", DateUtils.format(studentClassCheckMetaData.getEndTime(), DateUtils.YYYYMMDDHHMMSS_DATE_TIME_FORMATTER_1)));
     }
 
+    /**
+     * 初始化下拉刷新
+     */
     private void initSwipeRefreshLayout() {
         swipeRefreshLayout.setColorSchemeResources(
                 R.color.colorPrimary, R.color.colorAccent, R.color.class_color_1,
@@ -110,6 +134,9 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(this::initRecyclerViewData);
     }
 
+    /**
+     * 初始化RecyclerView
+     */
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -118,6 +145,9 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
         initRecyclerViewData();
     }
 
+    /**
+     * 初始化RecyclerView数据
+     */
     private void initRecyclerViewData() {
         assert studentClassCheckMetaData != null;
         swipeRefreshLayout.setRefreshing(true);
@@ -148,6 +178,12 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * 请求网络进行刷新标题数据
+     *
+     * @param studentClassCheckMetaData 签到元数据
+     * @param data                      学生班级签到DTO集合
+     */
     private void setInfo(StudentClassCheckMetaData studentClassCheckMetaData, List<StudentClassCheckDTO> data) {
         classLeaveDisposable = HttpHelper.get(ClassClient.class)
                 .getStudentClassLeave(studentClassCheckMetaData.getStudentClass().getId(), LocalDateTime.ofInstant(studentClassCheckMetaData.getGmtCreate().toInstant(), DateUtils.ZONE_ID).toLocalDate())
@@ -174,6 +210,9 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
         this.count.setText(MessageFormat.format("{0}人", data.size()));
     }
 
+    /**
+     * 初始化工具栏
+     */
     private void initToolBar() {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
