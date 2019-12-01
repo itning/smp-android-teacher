@@ -312,4 +312,13 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
         intent.putExtra("data", object);
         startActivity(intent);
     }
+
+    @Override
+    protected void onResume() {
+        if (App.needRefreshData) {
+            App.needRefreshData = false;
+            initRecyclerViewData(true, PageUtils.DEFAULT_PAGE, PageUtils.DEFAULT_SIZE);
+        }
+        super.onResume();
+    }
 }

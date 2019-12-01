@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -50,7 +52,7 @@ import static top.itning.smpandroidteacher.util.DateUtils.ZONE_ID;
 /**
  * @author itning
  */
-public class ClassDetailActivity extends AppCompatActivity implements StudentClassUserRecyclerViewAdapter.OnItemClickListener<StudentClassUser> {
+public class ClassDetailActivity extends AppCompatActivity implements StudentClassUserRecyclerViewAdapter.OnItemClickListener<StudentClassUser>, MenuItem.OnMenuItemClickListener {
     private static final String TAG = "ClassDetailActivity";
 
     @BindView(R2.id.tb)
@@ -73,6 +75,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
     private Page<StudentClassCheckMetaData> studentClassCheckMetaDataPage;
     private List<StudentClassCheckMetaData> studentClassCheckMetaDataList;
     private Disposable allStudentCheckMetaDataDisposable;
+    private Disposable delClassDisposable;
 
 
     @Override
@@ -126,6 +129,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+        toolbar.setOnMenuItemClickListener(this::onMenuItemClick);
     }
 
     @Override
@@ -147,6 +151,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         }
         if (allStudentCheckMetaDataDisposable != null && !allStudentCheckMetaDataDisposable.isDisposed()) {
             allStudentCheckMetaDataDisposable.dispose();
+        }
+        if (delClassDisposable != null && !delClassDisposable.isDisposed()) {
+            delClassDisposable.dispose();
         }
         super.onBackPressed();
     }
@@ -226,5 +233,48 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         Intent intent = new Intent(this, ClassCheckDetailActivity.class);
         intent.putExtra("data", studentClassCheckMetaData);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_class, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.item_del_class) {
+            if (studentClassDto == null) {
+                return false;
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("确定解散？")
+                    .setCancelable(false)
+                    .setNegativeButton("确定", (dialog, which) -> {
+                        ProgressDialog progressDialog = new ProgressDialog(this);
+                        progressDialog.setMessage("请稍后");
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                        delClassDisposable = HttpHelper.get(ClassClient.class)
+                                .delClass(studentClassDto.getId())
+                                .subscribeOn(Schedulers.computation())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(pageRestModel -> {
+                                    progressDialog.dismiss();
+                                    App.needRefreshData = true;
+                                    this.onBackPressed();
+                                }, HttpHelper.ErrorInvoke.get(this)
+                                        .before(t -> progressDialog.dismiss())
+                                        .orElseException(t -> {
+                                            Log.w(TAG, "网络请求错误", t);
+                                            Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                                        }));
+                    })
+                    .setPositiveButton("取消", null)
+                    .show();
+            return true;
+        }
+        return false;
     }
 }

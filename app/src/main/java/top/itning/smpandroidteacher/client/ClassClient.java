@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import io.reactivex.Observable;
+import retrofit2.Response;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -71,4 +72,14 @@ public interface ClassClient {
     @FormUrlEncoded
     @POST("/class/new_class")
     Observable<RestModel<StudentClass>> newClass(@Field("className") String className);
+
+    /**
+     * 删除班级
+     *
+     * @param studentClassId 班级ID
+     * @return no content
+     */
+    @FormUrlEncoded
+    @POST("/class/del_class")
+    Observable<Response<Object>> delClass(@Field("studentClassId") String studentClassId);
 }
