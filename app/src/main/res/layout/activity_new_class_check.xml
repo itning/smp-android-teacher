@@ -81,9 +81,33 @@
             android:entries="@array/class_check_m" />
 
         <TextView
+            android:id="@+id/tv_accuracy_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_max_m_info"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/new_class_accuracy_info"
+            android:textColor="#000"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_location_accuracy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_max_m_info"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_toEndOf="@id/tv_max_m_info"
+            android:text="@string/new_class_location_waiting"
+            android:textColor="#000"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_now_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_accuracy_info"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
             android:text="@string/new_class_location"
@@ -94,10 +118,10 @@
             android:id="@+id/tv_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_max_m_info"
+            android:layout_below="@id/tv_accuracy_info"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/tv_time_info"
+            android:layout_toEndOf="@id/tv_accuracy_info"
             android:text="@string/new_class_location_waiting"
             android:textColor="#000"
             android:textSize="16sp" />

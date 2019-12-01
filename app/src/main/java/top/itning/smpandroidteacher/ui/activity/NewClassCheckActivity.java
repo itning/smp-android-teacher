@@ -21,6 +21,7 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 
 import butterknife.BindView;
@@ -80,6 +81,8 @@ public class NewClassCheckActivity extends AppCompatActivity {
     AppCompatSpinner timeSpinner;
     @BindView(R2.id.spinner_m)
     AppCompatSpinner mSpinner;
+    @BindView(R2.id.tv_location_accuracy)
+    TextView accuracyTextView;
 
 
     @Override
@@ -208,19 +211,15 @@ public class NewClassCheckActivity extends AppCompatActivity {
                     if (longitude != 0 && latitude != 0) {
                         newCheckBtn.setVisibility(View.VISIBLE);
                     }
+                    if (accuracyTextView != null) {
+                        accuracyTextView.setText(MessageFormat.format("{0}米", aMapLocation.getAccuracy()));
+                    }
                     if (addressTextView != null) {
                         if (!"".equals(aMapLocation.getDescription())) {
-                            StringBuilder sb = new StringBuilder()
-                                    .append("精度（米）：")
-                                    .append(aMapLocation.getAccuracy())
-                                    .append(" ")
-                                    .append(aMapLocation.getDescription());
-                            addressTextView.setText(sb);
+                            addressTextView.setText(aMapLocation.getDescription());
                         } else {
                             StringBuilder sb = new StringBuilder()
-                                    .append("精度（米）：")
-                                    .append(aMapLocation.getAccuracy())
-                                    .append(" 经度：")
+                                    .append("经度：")
                                     .append(DECIMAL_FORMAT.format(aMapLocation.getLongitude()))
                                     .append(" 纬度：")
                                     .append(DECIMAL_FORMAT.format(aMapLocation.getLatitude()));
