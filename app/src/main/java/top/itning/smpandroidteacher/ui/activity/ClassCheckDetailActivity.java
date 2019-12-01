@@ -87,6 +87,7 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
             return;
         }
         initInfo();
+        initSwipeRefreshLayout();
         initRecyclerView();
     }
 
@@ -98,6 +99,15 @@ public class ClassCheckDetailActivity extends AppCompatActivity {
         count.setText("N/A");
         classStart.setText(MessageFormat.format("开始时间：{0}", DateUtils.format(studentClassCheckMetaData.getStartTime(), DateUtils.YYYYMMDDHHMMSS_DATE_TIME_FORMATTER_1)));
         classEnd.setText(MessageFormat.format("结束时间：{0}", DateUtils.format(studentClassCheckMetaData.getEndTime(), DateUtils.YYYYMMDDHHMMSS_DATE_TIME_FORMATTER_1)));
+    }
+
+    private void initSwipeRefreshLayout() {
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.colorPrimary, R.color.colorAccent, R.color.class_color_1,
+                R.color.class_color_2, R.color.class_color_3, R.color.class_color_4,
+                R.color.class_color_5, R.color.class_color_6, R.color.class_color_7
+        );
+        swipeRefreshLayout.setOnRefreshListener(this::initRecyclerViewData);
     }
 
     private void initRecyclerView() {

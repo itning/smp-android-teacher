@@ -221,6 +221,12 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         Log.d(TAG, object.toString());
     }
 
+    /**
+     * 当点击卡片中的某一项时（签到元数据）
+     *
+     * @param view                      View
+     * @param studentClassCheckMetaData StudentClassCheckMetaData
+     */
     private void onMetaDataClick(View view, StudentClassCheckMetaData studentClassCheckMetaData) {
         Intent intent = new Intent(this, ClassCheckDetailActivity.class);
         intent.putExtra("data", studentClassCheckMetaData);
