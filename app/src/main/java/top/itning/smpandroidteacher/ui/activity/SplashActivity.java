@@ -55,6 +55,25 @@ public class SplashActivity extends AppCompatActivity {
         initView();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!videoView.isPlaying()) {
+            videoView.start();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        videoView.stopPlayback();
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // do nothing
+    }
+
     /**
      * 初始化视图
      */
