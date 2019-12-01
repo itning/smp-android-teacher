@@ -351,6 +351,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
                 if (rv.getAdapter() != null) {
                     rv.getAdapter().notifyDataSetChanged();
                 }
+                initClassInfo();
                 App.needRefreshData = true;
             }
         }
