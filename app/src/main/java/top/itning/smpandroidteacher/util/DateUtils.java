@@ -27,6 +27,7 @@ public class DateUtils {
     public static final DateTimeFormatter YYYYMMDD_DATE_TIME_FORMATTER_6 = DateTimeFormatter.ofPattern("yyyy/MM/dd");
     public static final DateTimeFormatter YYYYMMDD_DATE_TIME_FORMATTER_7 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     public static final DateTimeFormatter YYYYMMDDHHMMSS_DATE_TIME_FORMATTER_8 = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm:ss");
+    public static final DateTimeFormatter HHMM_DATE_TIME_FORMATTER_9 = DateTimeFormatter.ofPattern("HH:mm");
 
     public static String helloTime(@Nullable String suffix) {
         if (suffix == null) {

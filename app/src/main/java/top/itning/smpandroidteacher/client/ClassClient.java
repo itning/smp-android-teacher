@@ -1,6 +1,7 @@
 package top.itning.smpandroidteacher.client;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -82,4 +83,24 @@ public interface ClassClient {
     @FormUrlEncoded
     @POST("/class/del_class")
     Observable<Response<Object>> delClass(@Field("studentClassId") String studentClassId);
+
+    /**
+     * 教师发起签到
+     *
+     * @param longitude      经度
+     * @param latitude       纬度
+     * @param studentClassId 课堂ID
+     * @param m              最远签到距离（米）
+     * @param startTime      签到开始时间
+     * @param endTime        签到结束时间
+     * @return 签到元数据
+     */
+    @FormUrlEncoded
+    @POST("/class/new_check")
+    Observable<RestModel<StudentClassCheckMetaData>> newCheck(@Field("longitude") double longitude,
+                                                             @Field("latitude") double latitude,
+                                                             @Field("studentClassId") String studentClassId,
+                                                             @Field("m") float m,
+                                                             @Field("startTime") LocalDateTime startTime,
+                                                             @Field("endTime") LocalDateTime endTime);
 }

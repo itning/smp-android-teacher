@@ -40,9 +40,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.ClassCheckDetailActivity"></activity>
-        <activity android:name=".ui.activity.ClassDetailActivity" />
-        <activity android:name=".ui.activity.PersonalActivity" />
+        <activity
+            android:name=".ui.activity.NewClassCheckActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.ClassCheckDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.ClassDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.PersonalActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.LoginActivity"
             android:screenOrientation="portrait" />

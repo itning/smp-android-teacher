@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('G:\\ProjectData\\AndroidStudioProjects\\smpandroidteacher\\debug.jks')
+            storePassword 'kingston'
+            keyAlias = 'smp-android-teacher'
+            keyPassword 'kingston'
+        }
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {

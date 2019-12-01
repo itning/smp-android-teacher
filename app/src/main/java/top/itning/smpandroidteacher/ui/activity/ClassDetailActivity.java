@@ -180,6 +180,15 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         bottomSheetDialog.show();
     }
 
+    public void onNewClassCheckClick(View v) {
+        if (studentClassDto == null) {
+            return;
+        }
+        Intent intent = new Intent(this, NewClassCheckActivity.class);
+        intent.putExtra("data", studentClassDto);
+        startActivity(intent);
+    }
+
     @SuppressWarnings("deprecation")
     private void initStudentClassCheckMetaData(boolean clear,
                                                @Nullable Integer page,

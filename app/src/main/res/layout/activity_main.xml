@@ -40,28 +40,60 @@
             android:src="@drawable/timg" />
     </RelativeLayout>
 
-    <com.loopeer.shadow.ShadowView
-        android:id="@+id/btn_personal"
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:elevation="10dp"
-        android:foreground="?attr/selectableItemBackground"
-        android:onClick="onShadowClick"
-        android:padding="10dp"
-        app:backgroundColor="#653EF8"
-        app:cornerRadius="4dp"
-        app:shadowColor="#653EF8"
-        app:shadowMargin="20dp"
-        app:shadowRadius="14dp">
+        android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:gravity="center"
-            android:text="个人中心"
-            android:textColor="#fff" />
-    </com.loopeer.shadow.ShadowView>
+        <com.loopeer.shadow.ShadowView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:elevation="10dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:onClick="onFabClick"
+            android:padding="10dp"
+            app:backgroundColor="#FD872A"
+            app:cornerRadius="4dp"
+            app:shadowColor="#FD872A"
+            app:shadowMargin="20dp"
+            app:shadowRadius="14dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginEnd="44dp"
+                android:gravity="center"
+                android:text="创建班级"
+                android:textColor="#fff" />
+        </com.loopeer.shadow.ShadowView>
+
+        <com.loopeer.shadow.ShadowView
+            android:id="@+id/btn_personal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:elevation="10dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:onClick="onShadowClick"
+            android:padding="10dp"
+            app:backgroundColor="#653EF8"
+            app:cornerRadius="4dp"
+            app:shadowColor="#653EF8"
+            app:shadowMargin="20dp"
+            app:shadowRadius="14dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginEnd="44dp"
+                android:gravity="center"
+                android:text="个人中心"
+                android:textColor="#fff" />
+        </com.loopeer.shadow.ShadowView>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
     <TextView
         android:layout_width="wrap_content"
@@ -86,16 +118,5 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="10dp"
-            android:onClick="onFabClick"
-            android:src="@drawable/outline_add_white_48"
-            app:backgroundTint="@color/colorAccent"
-            app:layout_behavior="top.itning.smpandroidteacher.ui.view.FabListBehavior" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>
