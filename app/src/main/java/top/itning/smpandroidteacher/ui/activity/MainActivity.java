@@ -1,6 +1,8 @@
 package top.itning.smpandroidteacher.ui.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,8 +10,13 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,7 +30,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -75,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
     private Disposable recyclerViewDataDisposable;
     private List<StudentClassDTO> studentClassDtoList;
     private Page<StudentClassDTO> studentClassDtoPage;
+    private Disposable createClassDisposable;
 
 
     @Override
@@ -166,7 +176,69 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
     }
 
     public void onFabClick(View view) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        @SuppressLint("InflateParams") View newClassView = getLayoutInflater().inflate(R.layout.alert_new_class, null);
+        TextInputLayout textInputLayout = newClassView.findViewById(R.id.ti_layout);
+        EditText editText = textInputLayout.getEditText();
+        if (editText != null) {
+            editText.setSingleLine();
+            editText.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if (editText.getText().length() == 0 || "".contentEquals(editText.getText())) {
+                        textInputLayout.setError("请输入要创建的班级名");
+                        return false;
+                    }
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (inputMethodManager != null) {
+                        inputMethodManager.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+                    }
+                    doCreateClass(editText.getText().toString(), bottomSheetDialog);
+                    return true;
+                }
+                return false;
+            });
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    textInputLayout.setError(null);
+                }
+            });
+        }
+        bottomSheetDialog.setContentView(newClassView);
+        bottomSheetDialog.show();
+    }
+
+    @SuppressWarnings("deprecation")
+    private void doCreateClass(String className, BottomSheetDialog bottomSheetDialog) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("正在创建");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        createClassDisposable = HttpHelper.get(ClassClient.class)
+                .newClass(className)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(pageRestModel -> {
+                    bottomSheetDialog.dismiss();
+                    progressDialog.dismiss();
+                    initRecyclerViewData(true, PageUtils.DEFAULT_PAGE, PageUtils.DEFAULT_SIZE);
+                }, HttpHelper.ErrorInvoke.get(this)
+                        .before(t -> progressDialog.dismiss())
+                        .orElseException(t -> {
+                            Log.w(TAG, "网络请求错误", t);
+                            Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                        }));
     }
 
     /**
@@ -227,6 +299,9 @@ public class MainActivity extends AppCompatActivity implements StudentClassRecyc
         }
         if (recyclerViewDataDisposable != null && !recyclerViewDataDisposable.isDisposed()) {
             recyclerViewDataDisposable.dispose();
+        }
+        if (createClassDisposable != null && !createClassDisposable.isDisposed()) {
+            createClassDisposable.dispose();
         }
         super.onBackPressed();
     }

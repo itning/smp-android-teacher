@@ -37,7 +37,6 @@ import top.itning.smpandroidteacher.R2;
 import top.itning.smpandroidteacher.client.ClassClient;
 import top.itning.smpandroidteacher.client.http.HttpHelper;
 import top.itning.smpandroidteacher.client.http.Page;
-import top.itning.smpandroidteacher.entity.LeaveDTO;
 import top.itning.smpandroidteacher.entity.StudentClassCheckMetaData;
 import top.itning.smpandroidteacher.entity.StudentClassDTO;
 import top.itning.smpandroidteacher.entity.StudentClassUser;
@@ -70,7 +69,6 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
     RecyclerView rv;
     @Nullable
     private StudentClassDTO studentClassDto;
-    private List<LeaveDTO> leaveDtoList;
     private Disposable leaveDisposable;
     private Page<StudentClassCheckMetaData> studentClassCheckMetaDataPage;
     private List<StudentClassCheckMetaData> studentClassCheckMetaDataList;
@@ -106,10 +104,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
                 .getStudentClassLeave(studentClassDto.getId(), LocalDate.now(ZONE_ID))
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(leaveDtoRestModel -> {
-                    leaveDtoList = leaveDtoRestModel.getData();
-                    classLeaveTextView.setText(MessageFormat.format("今天请假{0}人", leaveDtoRestModel.getData().size()));
-                }, HttpHelper.ErrorInvoke.get(this)
+                .subscribe(leaveDtoRestModel -> classLeaveTextView.setText(MessageFormat.format("今天请假{0}人", leaveDtoRestModel.getData().size())), HttpHelper.ErrorInvoke.get(this)
                         .orElseCode(t -> Snackbar.make(coordinatorLayout, t.getT2() == null ? t.getT1().code() + "" : t.getT2().getMsg(), Snackbar.LENGTH_LONG).show())
                         .orElseException(t -> {
                             Log.w(TAG, "网络请求错误", t);

@@ -4,12 +4,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 import io.reactivex.Observable;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import top.itning.smpandroidteacher.client.http.Page;
 import top.itning.smpandroidteacher.client.http.RestModel;
 import top.itning.smpandroidteacher.entity.LeaveDTO;
+import top.itning.smpandroidteacher.entity.StudentClass;
 import top.itning.smpandroidteacher.entity.StudentClassCheckDTO;
 import top.itning.smpandroidteacher.entity.StudentClassCheckMetaData;
 import top.itning.smpandroidteacher.entity.StudentClassDTO;
@@ -57,4 +61,14 @@ public interface ClassClient {
      */
     @GET("/class/check/{studentClassCheckMetaDataId}")
     Observable<RestModel<List<StudentClassCheckDTO>>> check(@Path("studentClassCheckMetaDataId") String studentClassCheckMetaDataId);
+
+    /**
+     * 创建班级
+     *
+     * @param className 班级名
+     * @return 创建的班级
+     */
+    @FormUrlEncoded
+    @POST("/class/new_class")
+    Observable<RestModel<StudentClass>> newClass(@Field("className") String className);
 }
