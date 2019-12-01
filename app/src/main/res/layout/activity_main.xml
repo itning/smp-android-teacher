@@ -39,7 +39,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/timg" />
+            android:src="@drawable/ic_launcher_teacher" />
     </RelativeLayout>
 
     <androidx.appcompat.widget.LinearLayoutCompat
