@@ -229,7 +229,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
 
     @Override
     public void onItemClick(View view, StudentClassUser object) {
-        Log.d(TAG, object.toString());
+        Intent intent = new Intent(this, ClassCheckUserActivity.class);
+        intent.putExtra("data", object);
+        startActivity(intent);
     }
 
     /**

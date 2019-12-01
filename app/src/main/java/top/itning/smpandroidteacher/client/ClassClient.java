@@ -98,9 +98,20 @@ public interface ClassClient {
     @FormUrlEncoded
     @POST("/class/new_check")
     Observable<RestModel<StudentClassCheckMetaData>> newCheck(@Field("longitude") double longitude,
-                                                             @Field("latitude") double latitude,
-                                                             @Field("studentClassId") String studentClassId,
-                                                             @Field("m") float m,
-                                                             @Field("startTime") LocalDateTime startTime,
-                                                             @Field("endTime") LocalDateTime endTime);
+                                                              @Field("latitude") double latitude,
+                                                              @Field("studentClassId") String studentClassId,
+                                                              @Field("m") float m,
+                                                              @Field("startTime") LocalDateTime startTime,
+                                                              @Field("endTime") LocalDateTime endTime);
+
+
+    /**
+     * 获取签到信息
+     *
+     * @param studentUserName 学生用户名
+     * @param studentClassId  班级ID
+     * @return 签到信息
+     */
+    @GET("/class/user_check_detail")
+    Observable<RestModel<List<StudentClassCheckDTO>>> getUserCheckDetail(@Query("studentUserName") String studentUserName, @Query("studentClassId") String studentClassId);
 }
