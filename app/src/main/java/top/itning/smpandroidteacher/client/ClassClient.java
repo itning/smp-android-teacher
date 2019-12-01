@@ -114,4 +114,16 @@ public interface ClassClient {
      */
     @GET("/class/user_check_detail")
     Observable<RestModel<List<StudentClassCheckDTO>>> getUserCheckDetail(@Query("studentUserName") String studentUserName, @Query("studentClassId") String studentClassId);
+
+    /**
+     * 教师删除自己班级的学生
+     *
+     * @param studentUserName 用户名
+     * @param studentClassId  班级ID
+     * @return no content
+     */
+    @FormUrlEncoded
+    @POST("/class/del_student")
+    Observable<Response<Object>> delStudent(@Field("studentUserName") String studentUserName,
+                                            @Field("studentClassId") String studentClassId);
 }

@@ -1,12 +1,16 @@
 package top.itning.smpandroidteacher.ui.activity;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,7 +39,7 @@ import top.itning.smpandroidteacher.ui.adapter.StudentCheckDetailRecyclerViewDat
  *
  * @author itning
  */
-public class ClassCheckUserActivity extends AppCompatActivity {
+public class ClassCheckUserActivity extends AppCompatActivity implements MenuItem.OnMenuItemClickListener {
     private static final String TAG = "ClassCheckUserActivity";
 
     @BindView(R2.id.tb)
@@ -57,6 +61,7 @@ public class ClassCheckUserActivity extends AppCompatActivity {
      * 学生打卡DTO集合
      */
     private List<StudentClassCheckDTO> studentClassCheckDtoList;
+    private Disposable delStudentDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +142,7 @@ public class ClassCheckUserActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
         }
+        toolbar.setOnMenuItemClickListener(this::onMenuItemClick);
     }
 
     @Override
@@ -153,6 +159,52 @@ public class ClassCheckUserActivity extends AppCompatActivity {
         if (userCheckDetailDisposable != null && !userCheckDetailDisposable.isDisposed()) {
             userCheckDetailDisposable.dispose();
         }
+        if (delStudentDisposable != null && !delStudentDisposable.isDisposed()) {
+            delStudentDisposable.dispose();
+        }
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_class_user_detail, menu);
+        return true;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        if (item.getItemId() == R.id.item_del_student) {
+            new AlertDialog.Builder(this)
+                    .setTitle("确定请离？")
+                    .setCancelable(false)
+                    .setNegativeButton("确定", (dialog, which) -> {
+                        ProgressDialog progressDialog = new ProgressDialog(this);
+                        progressDialog.setMessage("请稍后");
+                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        progressDialog.setCancelable(false);
+                        progressDialog.show();
+                        delStudentDisposable = HttpHelper.get(ClassClient.class)
+                                .delStudent(studentClassUser.getUser().getUsername(), studentClassUser.getStudentClass().getId())
+                                .subscribeOn(Schedulers.computation())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(objectResponse -> {
+                                    progressDialog.dismiss();
+                                    Intent intent = new Intent();
+                                    intent.putExtra("delStudentClassUser", studentClassUser);
+                                    this.setResult(RESULT_OK, intent);
+                                    this.onBackPressed();
+                                }, HttpHelper.ErrorInvoke.get(this)
+                                        .before(t -> progressDialog.dismiss())
+                                        .orElseException(t -> {
+                                            Log.w(TAG, "网络请求错误", t);
+                                            Toast.makeText(this, "网络请求错误", Toast.LENGTH_LONG).show();
+                                        }));
+                    })
+                    .setPositiveButton("取消", null)
+                    .show();
+            return true;
+        }
+        return false;
     }
 }

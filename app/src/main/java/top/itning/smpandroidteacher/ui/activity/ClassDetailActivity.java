@@ -56,6 +56,10 @@ import static top.itning.smpandroidteacher.util.DateUtils.ZONE_ID;
  */
 public class ClassDetailActivity extends AppCompatActivity implements StudentClassUserRecyclerViewAdapter.OnItemClickListener<StudentClassUser>, MenuItem.OnMenuItemClickListener {
     private static final String TAG = "ClassDetailActivity";
+    /**
+     * 班级打卡用户请求码
+     */
+    public static final int CLASS_CHECK_USER_REQUEST_CODE = 106;
 
     @BindView(R2.id.tb)
     MaterialToolbar toolbar;
@@ -74,7 +78,6 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
     /**
      * 学生班级DTO 从启动Activity获取的
      */
-    @Nullable
     private StudentClassDTO studentClassDto;
     /**
      * 资源
@@ -124,7 +127,6 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
      * 初始化班级信息
      */
     private void initClassInfo() {
-        assert studentClassDto != null;
         classNameTextView.setText(MessageFormat.format("班名：{0}", studentClassDto.getName()));
         classNumTextView.setText(MessageFormat.format("班号：{0}", studentClassDto.getClassNum()));
         classLeaveTextView.setText("请假：数据加载中...");
@@ -145,7 +147,6 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
      * 初始化RecyclerView
      */
     private void initRecyclerView() {
-        assert studentClassDto != null;
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rv.setLayoutManager(layoutManager);
         rv.setAdapter(new StudentClassUserRecyclerViewAdapter(studentClassDto.getStudentClassUserList(), this, this));
@@ -244,7 +245,6 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
                                                @Nullable Integer page,
                                                @Nullable Integer size,
                                                RecyclerView classCheckMetaRecyclerView) {
-        assert studentClassDto != null;
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("加载中");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -281,7 +281,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
     public void onItemClick(View view, StudentClassUser object) {
         Intent intent = new Intent(this, ClassCheckUserActivity.class);
         intent.putExtra("data", object);
-        startActivity(intent);
+        startActivityForResult(intent, CLASS_CHECK_USER_REQUEST_CODE);
     }
 
     /**
@@ -302,6 +302,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         if (item.getItemId() == R.id.item_del_class) {
@@ -337,5 +338,22 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
             return true;
         }
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == CLASS_CHECK_USER_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            StudentClassUser studentClassUser = (StudentClassUser) data.getSerializableExtra("delStudentClassUser");
+            if (studentClassUser != null) {
+                List<StudentClassUser> studentClassUserList = studentClassDto.getStudentClassUserList();
+                studentClassUserList.remove(studentClassUser);
+                studentClassDto.setStudentClassUserList(studentClassUserList);
+                if (rv.getAdapter() != null) {
+                    rv.getAdapter().notifyDataSetChanged();
+                }
+                App.needRefreshData = true;
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

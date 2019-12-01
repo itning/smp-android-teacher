@@ -13,11 +13,11 @@ import lombok.Data;
 @Data
 public class StudentClassUser implements Serializable {
     /**
-     * StudentClassUser ID
+     * 学生 ID
      */
     private User user;
     /**
-     * StudentClass ID
+     * 班级 ID
      */
     private StudentClass studentClass;
     /**
