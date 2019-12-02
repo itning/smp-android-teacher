@@ -25,7 +25,7 @@
         app:backgroundColor="@color/class_color_7"
         app:cornerRadius="4dp"
         app:shadowColor="@color/class_color_7"
-        app:shadowMarginBottom="3dp"
+        app:shadowMarginBottom="0dp"
         app:shadowMarginLeft="20dp"
         app:shadowMarginRight="20dp"
         app:shadowMarginTop="20dp"

@@ -20,33 +20,34 @@
 
         <TextView
             android:id="@+id/tv_class_name_info"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
             android:text="@string/new_class_name"
             android:textColor="#000"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tv_class_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/tv_class_name_info"
-            android:background="?attr/selectableItemBackground"
-            android:textColor="#000"
-            android:textSize="16sp"
+            style="@style/list_item_right"
             tools:text="1604" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/listDivider" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
 
         <TextView
             android:id="@+id/tv_time_info"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_class_name_info"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
             android:text="@string/new_class_time"
             android:textColor="#000"
             android:textSize="16sp" />
@@ -55,18 +56,30 @@
             android:id="@+id/spinner_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_class_name"
-            android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/tv_time_info"
-            android:entries="@array/class_check_time" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="-18dp"
+            android:background="@null"
+            android:entries="@array/class_check_time"
+            android:spinnerMode="dialog" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/listDivider" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
 
         <TextView
             android:id="@+id/tv_max_m_info"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/spinner_time"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
             android:text="@string/new_class_max_m"
             android:textColor="#000"
             android:textSize="16sp" />
@@ -75,53 +88,63 @@
             android:id="@+id/spinner_m"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/spinner_time"
-            android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/tv_time_info"
-            android:entries="@array/class_check_m" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="-26dp"
+            android:background="@null"
+            android:entries="@array/class_check_m"
+            android:spinnerMode="dialog" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/listDivider" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
 
         <TextView
             android:id="@+id/tv_accuracy_info"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_max_m_info"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
             android:text="@string/new_class_accuracy_info"
             android:textColor="#000"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tv_location_accuracy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_max_m_info"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/tv_max_m_info"
+            style="@style/list_item_right"
             android:text="@string/new_class_location_waiting"
-            android:textColor="#000"
-            android:textSize="16sp" />
+            android:textColor="#000" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?android:attr/listDivider" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
 
         <TextView
             android:id="@+id/tv_now_location"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_accuracy_info"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
             android:text="@string/new_class_location"
             android:textColor="#000"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tv_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tv_accuracy_info"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_toEndOf="@id/tv_accuracy_info"
+            style="@style/list_item_right"
             android:text="@string/new_class_location_waiting"
             android:textColor="#000"
             android:textSize="16sp" />
@@ -129,10 +152,10 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_new_check"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_margin="16dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:backgroundTint="@color/colorAccent"
         android:paddingStart="32dp"
         android:paddingTop="16dp"

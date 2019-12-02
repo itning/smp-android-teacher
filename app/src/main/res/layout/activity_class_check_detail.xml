@@ -22,9 +22,9 @@
         android:elevation="10dp"
         android:foreground="?attr/selectableItemBackground"
         android:padding="10dp"
-        app:backgroundColor="@color/class_color_7"
+        app:backgroundColor="@color/class_color_6"
         app:cornerRadius="4dp"
-        app:shadowColor="@color/class_color_7"
+        app:shadowColor="@color/class_color_6"
         app:shadowMargin="20dp"
         app:shadowRadius="14dp">
 
@@ -91,14 +91,15 @@
 
             <TextView
                 android:id="@+id/tv_count"
-                android:layout_width="55dp"
+                android:layout_width="130dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
+                android:layout_marginTop="12dp"
+                android:gravity="end"
                 android:textColor="#fff"
-                android:textSize="23sp"
+                android:textSize="30sp"
                 android:textStyle="bold"
-                tool:text="16人" />
+                tool:text="106人" />
         </RelativeLayout>
     </com.loopeer.shadow.ShadowView>
 

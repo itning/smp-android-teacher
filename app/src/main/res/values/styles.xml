@@ -8,4 +8,12 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
+    <style name="list_item_right">
+        <item name="android:maxWidth">200dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:gravity">end</item>
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>
