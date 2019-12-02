@@ -12,11 +12,7 @@ import lombok.Data;
  */
 @Data
 public class Role implements Serializable {
-    public static Role withStudentUser() {
-        Role role = new Role();
-        role.setId("1");
-        return role;
-    }
+    public static final String TEACHER_ROLE_ID = "2";
 
     /**
      * 角色ID
