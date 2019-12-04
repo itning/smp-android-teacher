@@ -60,7 +60,7 @@ public class StudentClassCheckRecyclerViewAdapter extends RecyclerView.Adapter<S
 
     private String getCheckStatus(StudentClassCheckDTO studentClassCheckDto) {
         if (studentClassCheckDto.getCheck() == null) {
-            return "未签到";
+            return "请假";
         } else if (studentClassCheckDto.getCheck()) {
             return "已签到";
         } else {
