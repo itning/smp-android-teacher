@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,6 +29,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -37,6 +41,7 @@ import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import top.itning.smpandroidteacher.BuildConfig;
 import top.itning.smpandroidteacher.R;
 import top.itning.smpandroidteacher.R2;
 import top.itning.smpandroidteacher.client.ClassClient;
@@ -102,6 +107,10 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
      * 资源
      */
     private Disposable delClassDisposable;
+    /**
+     * 资源
+     */
+    private Disposable fileDisposable;
 
 
     @Override
@@ -190,6 +199,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         }
         if (delClassDisposable != null && !delClassDisposable.isDisposed()) {
             delClassDisposable.dispose();
+        }
+        if (fileDisposable != null && !fileDisposable.isDisposed()) {
+            fileDisposable.dispose();
         }
         super.onBackPressed();
     }
@@ -338,6 +350,45 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
                     })
                     .setPositiveButton("取消", null)
                     .show();
+            return true;
+        }
+        if (item.getItemId() == R.id.item_export_check) {
+            if (studentClassDto == null) {
+                Snackbar.make(coordinatorLayout, "班级信息异常", Snackbar.LENGTH_LONG).show();
+                return true;
+            }
+            fileDisposable = HttpHelper.get(ClassClient.class)
+                    .exportCheck(studentClassDto.getId())
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(Schedulers.io())
+                    .subscribe(responseBody -> {
+                        File externalFilesDir = getExternalFilesDir(null);
+                        File file = new File(externalFilesDir + File.separator + studentClassDto.getName() + System.currentTimeMillis() + ".xlsx");
+                        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                            fileOutputStream.write(responseBody.source().readByteArray());
+                            runOnUiThread(() -> Snackbar
+                                    .make(coordinatorLayout, "下载完成", Snackbar.LENGTH_LONG)
+                                    .setAction("打开", v -> {
+                                        Intent intent = new Intent();
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                        Uri contentUri = FileProvider.getUriForFile(ClassDetailActivity.this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
+                                        intent.setAction(Intent.ACTION_VIEW);
+                                        intent.setDataAndType(contentUri, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                                        ClassDetailActivity.this.startActivity(intent);
+                                    })
+                                    .show());
+                        } catch (Exception e) {
+                            Log.e(TAG, "write file exception", e);
+                            runOnUiThread(() -> Snackbar.make(coordinatorLayout, "下载失败", Snackbar.LENGTH_LONG).show());
+                        }
+                    }, HttpHelper.ErrorInvoke.get(this)
+                            .orElseException(t -> runOnUiThread(() -> {
+                                Log.w(TAG, "网络请求错误", t);
+                                Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                            })));
+
             return true;
         }
         return false;

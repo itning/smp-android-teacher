@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -12,6 +13,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.Streaming;
 import top.itning.smpandroidteacher.client.http.Page;
 import top.itning.smpandroidteacher.client.http.RestModel;
 import top.itning.smpandroidteacher.entity.LeaveDTO;
@@ -126,4 +128,14 @@ public interface ClassClient {
     @POST("/class/del_student")
     Observable<Response<Object>> delStudent(@Field("studentUserName") String studentUserName,
                                             @Field("studentClassId") String studentClassId);
+
+    /**
+     * 导出某班打卡信息
+     *
+     * @param studentClassId 班级ID
+     * @return ResponseBody
+     */
+    @Streaming
+    @GET("/class/export/check")
+    Observable<ResponseBody> exportCheck(@Query("studentClassId") String studentClassId);
 }

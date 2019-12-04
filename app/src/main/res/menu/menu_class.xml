@@ -4,6 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="top.itning.smpandroid.ui.activity.ClassCheckActivity">
     <item
+        android:id="@+id/item_export_check"
+        android:title="@string/menu_export_check_str"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/item_del_class"
         android:title="@string/menu_del_class_str"
         app:showAsAction="never" />
