@@ -21,6 +21,7 @@
         android:layout_margin="0dp"
         android:elevation="10dp"
         android:foreground="?attr/selectableItemBackground"
+        android:onClick="onShadowViewClick"
         android:padding="10dp"
         app:backgroundColor="@color/class_color_7"
         app:cornerRadius="4dp"

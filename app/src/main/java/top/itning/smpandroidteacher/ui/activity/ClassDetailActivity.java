@@ -2,6 +2,9 @@ package top.itning.smpandroidteacher.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -356,5 +359,19 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * 当标题信息面板被点击时的事件处理
+     *
+     * @param view View
+     */
+    public void onShadowViewClick(View view) {
+        ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboardManager != null && studentClassDto != null) {
+            ClipData clipData = ClipData.newPlainText("class_num", studentClassDto.getClassNum());
+            clipboardManager.setPrimaryClip(clipData);
+            Snackbar.make(coordinatorLayout, "已复制班号", Snackbar.LENGTH_SHORT).show();
+        }
     }
 }
