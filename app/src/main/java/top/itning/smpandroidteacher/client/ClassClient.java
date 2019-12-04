@@ -5,12 +5,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Streaming;
@@ -21,6 +24,7 @@ import top.itning.smpandroidteacher.entity.StudentClass;
 import top.itning.smpandroidteacher.entity.StudentClassCheckDTO;
 import top.itning.smpandroidteacher.entity.StudentClassCheckMetaData;
 import top.itning.smpandroidteacher.entity.StudentClassDTO;
+import top.itning.smpandroidteacher.entity.StudentClassUser;
 
 /**
  * @author itning
@@ -138,4 +142,15 @@ public interface ClassClient {
     @Streaming
     @GET("/class/export/check")
     Observable<ResponseBody> exportCheck(@Query("studentClassId") String studentClassId);
+
+    /**
+     * 通过EXCEL文件导入学生到某个班级
+     *
+     * @param studentClassId 班级ID
+     * @param file           文件
+     * @return 导入的学生
+     */
+    @Multipart
+    @POST("/class/student_class/file/{studentClassId}")
+    Observable<RestModel<List<StudentClassUser>>> importStudentByFile(@Path("studentClassId") String studentClassId, @Part MultipartBody.Part file);
 }

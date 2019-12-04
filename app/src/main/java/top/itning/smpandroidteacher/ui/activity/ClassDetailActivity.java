@@ -2,8 +2,10 @@ package top.itning.smpandroidteacher.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -13,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,8 +32,10 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,6 +46,9 @@ import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import top.itning.smpandroidteacher.BuildConfig;
 import top.itning.smpandroidteacher.R;
 import top.itning.smpandroidteacher.R2;
@@ -68,6 +76,18 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
      * 班级打卡用户请求码
      */
     public static final int CLASS_CHECK_USER_REQUEST_CODE = 106;
+    /**
+     * 文件选择请求码
+     */
+    private static final int FILE_SELECT_REQUEST_CODE = 107;
+    /**
+     * XLSX MIME
+     */
+    private static final String XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    /**
+     * XLS MIME
+     */
+    private static final String XLS_MIME = "application/vnd.ms-excel";
 
     @BindView(R2.id.tb)
     MaterialToolbar toolbar;
@@ -111,6 +131,10 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
      * 资源
      */
     private Disposable fileDisposable;
+    /**
+     * 资源
+     */
+    private Disposable upFileDisposable;
 
 
     @Override
@@ -202,6 +226,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         }
         if (fileDisposable != null && !fileDisposable.isDisposed()) {
             fileDisposable.dispose();
+        }
+        if (upFileDisposable != null && !upFileDisposable.isDisposed()) {
+            upFileDisposable.dispose();
         }
         super.onBackPressed();
     }
@@ -375,7 +402,7 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
                                         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                         Uri contentUri = FileProvider.getUriForFile(ClassDetailActivity.this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
                                         intent.setAction(Intent.ACTION_VIEW);
-                                        intent.setDataAndType(contentUri, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                                        intent.setDataAndType(contentUri, XLSX_MIME);
                                         ClassDetailActivity.this.startActivity(intent);
                                     })
                                     .show());
@@ -391,9 +418,26 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
 
             return true;
         }
+        if (item.getItemId() == R.id.item_import_student) {
+            if (studentClassDto == null) {
+                Snackbar.make(coordinatorLayout, "班级信息异常", Snackbar.LENGTH_LONG).show();
+                return true;
+            }
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{XLSX_MIME, XLS_MIME});
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            try {
+                startActivityForResult(Intent.createChooser(intent, "选择学生数据表格"), FILE_SELECT_REQUEST_CODE);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "没有找到文件管理APP", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
         return false;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == CLASS_CHECK_USER_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
@@ -407,6 +451,72 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
                 }
                 initClassInfo();
                 App.needRefreshData = true;
+            }
+        } else if (requestCode == FILE_SELECT_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri == null) {
+                Snackbar.make(coordinatorLayout, "解析失败，URI为空", Snackbar.LENGTH_LONG).show();
+                return;
+            }
+            ContentResolver contentResolver = getContentResolver();
+            try (InputStream is = contentResolver.openInputStream(uri)) {
+                if (is == null) {
+                    Snackbar.make(coordinatorLayout, "解析失败，数据流为空", Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] byteData = new byte[16384];
+                while ((nRead = is.read(byteData, 0, byteData.length)) != -1) {
+                    buffer.write(byteData, 0, nRead);
+                }
+                byte[] bytes = buffer.toByteArray();
+                String mime = contentResolver.getType(uri);
+                String fileName = System.currentTimeMillis() + "";
+                if (XLSX_MIME.equals(mime)) {
+                    fileName += ".xlsx";
+                } else if (XLS_MIME.equals(mime)) {
+                    fileName += ".xls";
+                }
+                ProgressDialog progressDialog = new ProgressDialog(this);
+                progressDialog.setMessage("正在上传数据");
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                RequestBody body = RequestBody.create(MediaType.parse("application/otcet-stream"), bytes);
+                MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileName, body);
+                upFileDisposable = HttpHelper.get(ClassClient.class)
+                        .importStudentByFile(studentClassDto.getId(), part)
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(listRestModel -> {
+                            progressDialog.dismiss();
+                            List<StudentClassUser> studentClassUserList = listRestModel.getData();
+                            if (studentClassUserList == null || studentClassUserList.isEmpty()) {
+                                Snackbar.make(coordinatorLayout, "添加0人", Snackbar.LENGTH_LONG).show();
+                            } else {
+                                Snackbar.make(coordinatorLayout, "添加" + studentClassUserList.size() + "人", Snackbar.LENGTH_LONG).show();
+                                List<StudentClassUser> list = studentClassDto.getStudentClassUserList();
+                                list.addAll(0, studentClassUserList);
+                                if (rv.getAdapter() != null) {
+                                    rv.getAdapter().notifyDataSetChanged();
+                                }
+                                initClassInfo();
+                                App.needRefreshData = true;
+                            }
+                        }, HttpHelper.ErrorInvoke.get(this)
+                                .before(t -> progressDialog.dismiss())
+                                .orElseCode(t -> {
+                                    String msg = t.getT2() != null ? t.getT2().getMsg() : t.getT1().code() + "";
+                                    Snackbar.make(coordinatorLayout, msg, Snackbar.LENGTH_LONG).show();
+                                })
+                                .orElseException(t -> {
+                                    Log.w(TAG, "网络请求错误", t);
+                                    Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                                }));
+            } catch (Exception e) {
+                Log.e(TAG, "up file get exception", e);
+                Snackbar.make(coordinatorLayout, "上传失败", Snackbar.LENGTH_LONG).show();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
