@@ -23,4 +23,6 @@
     <string name="new_class_accuracy_info">定位精度：</string>
     <string name="menu_export_check_str">导出签到信息</string>
     <string name="menu_import_student_str">导入学生</string>
+    <string name="change_password_hint_str">新密码</string>
+    <string name="change_password">修改密码</string>
 </resources>
