@@ -3,10 +3,13 @@ package top.itning.smpandroidteacher.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -110,6 +113,7 @@ public class NewClassCheckActivity extends AppCompatActivity {
     /**
      * 初始化信息
      */
+    @SuppressWarnings("deprecation")
     private void initInfo() {
         final float[] m = {5f};
         final int[] time = {3};
@@ -118,6 +122,7 @@ public class NewClassCheckActivity extends AppCompatActivity {
         timeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                setStyle(position);
                 switch (position) {
                     case 1:
                         time[0] = 5;
@@ -137,10 +142,24 @@ public class NewClassCheckActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
 
             }
+
+            private void setStyle(int position) {
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.addRule(RelativeLayout.ALIGN_PARENT_END);
+                timeSpinner.setBackground(null);
+                if (position < 2) {
+                    lp.setMargins(0, 0, (int) convertDpToPixel(-18), 0);
+                    timeSpinner.setLayoutParams(lp);
+                } else {
+                    lp.setMargins(0, 0, (int) convertDpToPixel(-9), 0);
+                    timeSpinner.setLayoutParams(lp);
+                }
+            }
         });
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                setStyle(position);
                 switch (position) {
                     case 1:
                         m[0] = 50f;
@@ -165,6 +184,22 @@ public class NewClassCheckActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+
+            private void setStyle(int position) {
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.addRule(RelativeLayout.ALIGN_PARENT_END);
+                mSpinner.setBackground(null);
+                if (position < 2) {
+                    lp.setMargins(0, 0, (int) convertDpToPixel(-26), 0);
+                    mSpinner.setLayoutParams(lp);
+                } else if (position < 5) {
+                    lp.setMargins(0, 0, (int) convertDpToPixel(-16), 0);
+                    mSpinner.setLayoutParams(lp);
+                } else {
+                    lp.setMargins(0, 0, (int) convertDpToPixel(-7), 0);
+                    mSpinner.setLayoutParams(lp);
+                }
             }
         });
         newCheckBtn.setOnClickListener(v -> {
@@ -286,5 +321,15 @@ public class NewClassCheckActivity extends AppCompatActivity {
             disposable.dispose();
         }
         super.onBackPressed();
+    }
+
+    /**
+     * This method converts dp unit to equivalent pixels, depending on device density.
+     *
+     * @param dp A value in dp (density independent pixels) unit. Which we need to convert into pixels
+     * @return A float value to represent px equivalent to dp depending on device density
+     */
+    public float convertDpToPixel(float dp) {
+        return dp * ((float) this.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }
