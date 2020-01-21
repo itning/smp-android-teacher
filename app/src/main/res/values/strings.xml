@@ -18,11 +18,13 @@
     <string name="base_url_hint_str">Base Url</string>
     <string name="leave_reason_my_str">我发起的签到</string>
     <string name="new_class_name_hint_str">请输入班名</string>
-    <string name="menu_del_class_str">解散班级</string>
+    <string name="menu_del_class_str">立即解散班级</string>
     <string name="menu_del_student_str">请离该学生</string>
     <string name="new_class_accuracy_info">定位精度：</string>
     <string name="menu_export_check_str">导出签到信息</string>
-    <string name="menu_import_student_str">导入学生</string>
+    <string name="menu_import_student_str">导入学生信息</string>
     <string name="change_password_hint_str">新密码</string>
     <string name="change_password">修改密码</string>
+    <string name="menu_modify_class_name_str">修改班级名称</string>
+    <string name="modify_class_name_hint_str">新班级名称</string>
 </resources>

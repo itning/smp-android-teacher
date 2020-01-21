@@ -153,4 +153,15 @@ public interface ClassClient {
     @Multipart
     @POST("/class/student_class/file/{studentClassId}")
     Observable<RestModel<List<StudentClassUser>>> importStudentByFile(@Path("studentClassId") String studentClassId, @Part MultipartBody.Part file);
+
+    /**
+     * 教师修改自己班级名称
+     *
+     * @param newStudentClassName 新班级名称
+     * @param studentClassId      班级ID
+     * @return no content
+     */
+    @FormUrlEncoded
+    @POST("/class/student_class_name")
+    Observable<Response<Object>> modifyStudentClassName(@Field("newStudentClassName") String newStudentClassName, @Field("studentClassId") String studentClassId);
 }

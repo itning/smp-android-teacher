@@ -10,10 +10,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -55,6 +61,7 @@ import top.itning.smpandroidteacher.R2;
 import top.itning.smpandroidteacher.client.ClassClient;
 import top.itning.smpandroidteacher.client.http.HttpHelper;
 import top.itning.smpandroidteacher.client.http.Page;
+import top.itning.smpandroidteacher.client.http.RestModel;
 import top.itning.smpandroidteacher.entity.StudentClassCheckMetaData;
 import top.itning.smpandroidteacher.entity.StudentClassDTO;
 import top.itning.smpandroidteacher.entity.StudentClassUser;
@@ -135,6 +142,10 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
      * 资源
      */
     private Disposable upFileDisposable;
+    /**
+     * 资源
+     */
+    private Disposable modifyStudentClassNameDisposable;
 
 
     @Override
@@ -229,6 +240,9 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         }
         if (upFileDisposable != null && !upFileDisposable.isDisposed()) {
             upFileDisposable.dispose();
+        }
+        if (modifyStudentClassNameDisposable != null && !modifyStudentClassNameDisposable.isDisposed()) {
+            modifyStudentClassNameDisposable.dispose();
         }
         super.onBackPressed();
     }
@@ -344,97 +358,228 @@ public class ClassDetailActivity extends AppCompatActivity implements StudentCla
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        if (item.getItemId() == R.id.item_del_class) {
-            if (studentClassDto == null) {
+        switch (item.getItemId()) {
+            case R.id.item_del_class:
+                return doDelClass();
+            case R.id.item_export_check:
+                return doExportClassCheck();
+            case R.id.item_import_student:
+                return doImportStudentInfo();
+            case R.id.item_modify_class_name:
+                return doModifyClassName();
+            default:
                 return false;
-            }
-            new AlertDialog.Builder(this)
-                    .setTitle("确定解散？")
-                    .setCancelable(false)
-                    .setNegativeButton("确定", (dialog, which) -> {
-                        ProgressDialog progressDialog = new ProgressDialog(this);
-                        progressDialog.setMessage("请稍后");
-                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                        progressDialog.setCancelable(false);
-                        progressDialog.show();
-                        delClassDisposable = HttpHelper.get(ClassClient.class)
-                                .delClass(studentClassDto.getId())
-                                .subscribeOn(Schedulers.computation())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(pageRestModel -> {
-                                    progressDialog.dismiss();
-                                    App.needRefreshData = true;
-                                    this.onBackPressed();
-                                }, HttpHelper.ErrorInvoke.get(this)
-                                        .before(t -> progressDialog.dismiss())
-                                        .orElseException(t -> {
-                                            Log.w(TAG, "网络请求错误", t);
-                                            Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
-                                        }));
-                    })
-                    .setPositiveButton("取消", null)
-                    .show();
-            return true;
         }
-        if (item.getItemId() == R.id.item_export_check) {
-            if (studentClassDto == null) {
-                Snackbar.make(coordinatorLayout, "班级信息异常", Snackbar.LENGTH_LONG).show();
-                return true;
-            }
-            fileDisposable = HttpHelper.get(ClassClient.class)
-                    .exportCheck(studentClassDto.getId())
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(Schedulers.io())
-                    .subscribe(responseBody -> {
-                        File externalFilesDir = getExternalFilesDir(null);
-                        File file = new File(externalFilesDir + File.separator + studentClassDto.getName() + System.currentTimeMillis() + ".xlsx");
-                        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                            fileOutputStream.write(responseBody.source().readByteArray());
-                            runOnUiThread(() -> Snackbar
-                                    .make(coordinatorLayout, "下载完成", Snackbar.LENGTH_LONG)
-                                    .setAction("打开", v -> {
-                                        Intent intent = new Intent();
-                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                        Uri contentUri = FileProvider.getUriForFile(ClassDetailActivity.this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
-                                        intent.setAction(Intent.ACTION_VIEW);
-                                        intent.setDataAndType(contentUri, XLSX_MIME);
-                                        ClassDetailActivity.this.startActivity(intent);
-                                    })
-                                    .show());
-                        } catch (Exception e) {
-                            Log.e(TAG, "write file exception", e);
-                            runOnUiThread(() -> Snackbar.make(coordinatorLayout, "下载失败", Snackbar.LENGTH_LONG).show());
-                        }
-                    }, HttpHelper.ErrorInvoke.get(this)
-                            .orElseException(t -> runOnUiThread(() -> {
-                                Log.w(TAG, "网络请求错误", t);
-                                Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
-                            })));
+    }
 
+    /**
+     * 修改班级名称
+     *
+     * @return <code>true</code>正常处理信息
+     */
+    private boolean doModifyClassName() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        @SuppressLint("InflateParams") View newClassView = getLayoutInflater().inflate(R.layout.alert_modify_class_name, null);
+        TextInputLayout textInputLayout = newClassView.findViewById(R.id.ti_layout);
+        EditText editText = textInputLayout.getEditText();
+        if (editText != null) {
+            editText.setSingleLine();
+            if (studentClassDto != null) {
+                editText.setText(studentClassDto.getName());
+                editText.setSelectAllOnFocus(true);
+            }
+            editText.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if (editText.getText().length() == 0 || "".contentEquals(editText.getText())) {
+                        textInputLayout.setError("请输入新班级名称");
+                        return false;
+                    }
+                    InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (inputMethodManager != null) {
+                        inputMethodManager.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), InputMethodManager.RESULT_UNCHANGED_SHOWN);
+                    }
+                    doModifyClassName(editText.getText().toString(), bottomSheetDialog);
+                    return true;
+                }
+                return false;
+            });
+            editText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    textInputLayout.setError(null);
+                }
+            });
+        }
+        bottomSheetDialog.setContentView(newClassView);
+        bottomSheetDialog.show();
+        return true;
+    }
+
+    /**
+     * 修改班级名称
+     *
+     * @param newClassName      新班级名称
+     * @param bottomSheetDialog BottomSheetDialog
+     */
+    private void doModifyClassName(String newClassName, BottomSheetDialog bottomSheetDialog) {
+        if (studentClassDto == null) {
+            Snackbar.make(coordinatorLayout, "班级信息获取错误", Snackbar.LENGTH_LONG).show();
+            return;
+        }
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("正在修改");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        modifyStudentClassNameDisposable = HttpHelper.get(ClassClient.class)
+                .modifyStudentClassName(newClassName, studentClassDto.getId())
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(objectResponse -> {
+                    if (objectResponse.errorBody() != null) {
+                        RestModel<String> restModel = HttpHelper.getRestModelFromErrorBody(objectResponse.errorBody());
+                        if (restModel != null) {
+                            Log.w(TAG, "网络请求错误:" + restModel.toString());
+                            Snackbar.make(coordinatorLayout, "网络请求错误:" + restModel.getMsg(), Snackbar.LENGTH_LONG).show();
+                        }
+                    } else {
+                        studentClassDto.setName(newClassName);
+                        classNameTextView.setText(MessageFormat.format("班名：{0}", studentClassDto.getName()));
+                    }
+                    App.needRefreshData = true;
+                    bottomSheetDialog.dismiss();
+                    progressDialog.dismiss();
+                }, HttpHelper.ErrorInvoke.get(this)
+                        .before(t -> progressDialog.dismiss())
+                        .orElseException(t -> {
+                            Log.w(TAG, "网络请求错误", t);
+                            Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                        }));
+    }
+
+    /**
+     * 导入学生信息
+     *
+     * @return <code>true</code>正常处理信息
+     */
+    private boolean doImportStudentInfo() {
+        if (studentClassDto == null) {
+            Snackbar.make(coordinatorLayout, "班级信息异常", Snackbar.LENGTH_LONG).show();
             return true;
         }
-        if (item.getItemId() == R.id.item_import_student) {
-            if (studentClassDto == null) {
-                Snackbar.make(coordinatorLayout, "班级信息异常", Snackbar.LENGTH_LONG).show();
-                return true;
-            }
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("*/*");
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{XLSX_MIME, XLS_MIME});
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            try {
-                startActivityForResult(Intent.createChooser(intent, "选择学生数据表格"), FILE_SELECT_REQUEST_CODE);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, "没有找到文件管理APP", Toast.LENGTH_SHORT).show();
-            }
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{XLSX_MIME, XLS_MIME});
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        try {
+            startActivityForResult(Intent.createChooser(intent, "选择学生数据表格"), FILE_SELECT_REQUEST_CODE);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "没有找到文件管理APP", Toast.LENGTH_SHORT).show();
+        }
+        return true;
+    }
+
+    /**
+     * 导出班级签到信息
+     *
+     * @return <code>true</code>正常处理信息
+     */
+    private boolean doExportClassCheck() {
+        if (studentClassDto == null) {
+            Snackbar.make(coordinatorLayout, "班级信息异常", Snackbar.LENGTH_LONG).show();
             return true;
         }
-        return false;
+        fileDisposable = HttpHelper.get(ClassClient.class)
+                .exportCheck(studentClassDto.getId())
+                .subscribeOn(Schedulers.computation())
+                .observeOn(Schedulers.io())
+                .subscribe(responseBody -> {
+                    File externalFilesDir = getExternalFilesDir(null);
+                    File file = new File(externalFilesDir + File.separator + studentClassDto.getName() + System.currentTimeMillis() + ".xlsx");
+                    try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                        fileOutputStream.write(responseBody.source().readByteArray());
+                        runOnUiThread(() -> Snackbar
+                                .make(coordinatorLayout, "下载完成", Snackbar.LENGTH_LONG)
+                                .setAction("打开", v -> {
+                                    Intent intent = new Intent();
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    Uri contentUri = FileProvider.getUriForFile(ClassDetailActivity.this, BuildConfig.APPLICATION_ID + ".fileProvider", file);
+                                    intent.setAction(Intent.ACTION_VIEW);
+                                    intent.setDataAndType(contentUri, XLSX_MIME);
+                                    ClassDetailActivity.this.startActivity(intent);
+                                })
+                                .show());
+                    } catch (Exception e) {
+                        Log.e(TAG, "write file exception", e);
+                        runOnUiThread(() -> Snackbar.make(coordinatorLayout, "下载失败", Snackbar.LENGTH_LONG).show());
+                    }
+                }, HttpHelper.ErrorInvoke.get(this)
+                        .orElseException(t -> runOnUiThread(() -> {
+                            Log.w(TAG, "网络请求错误", t);
+                            Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                        })));
+
+        return true;
+    }
+
+    /**
+     * 教师删除班级
+     *
+     * @return <code>true</code>正常处理信息
+     */
+    private boolean doDelClass() {
+        if (studentClassDto == null) {
+            return false;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("确定解散？")
+                .setCancelable(false)
+                .setNegativeButton("确定", (dialog, which) -> {
+                    ProgressDialog progressDialog = new ProgressDialog(this);
+                    progressDialog.setMessage("请稍后");
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progressDialog.setCancelable(false);
+                    progressDialog.show();
+                    delClassDisposable = HttpHelper.get(ClassClient.class)
+                            .delClass(studentClassDto.getId())
+                            .subscribeOn(Schedulers.computation())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(objectResponse -> {
+                                progressDialog.dismiss();
+                                App.needRefreshData = true;
+                                if (objectResponse.errorBody() != null) {
+                                    RestModel<String> restModel = HttpHelper.getRestModelFromErrorBody(objectResponse.errorBody());
+                                    if (restModel != null) {
+                                        Log.w(TAG, "错误：" + restModel.toString());
+                                        Toast.makeText(this, "错误：" + restModel.getMsg(), Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    this.onBackPressed();
+                                }
+                            }, HttpHelper.ErrorInvoke.get(this)
+                                    .before(t -> progressDialog.dismiss())
+                                    .orElseException(t -> {
+                                        Log.w(TAG, "网络请求错误", t);
+                                        Snackbar.make(coordinatorLayout, "网络请求错误", Snackbar.LENGTH_LONG).show();
+                                    }));
+                })
+                .setPositiveButton("取消", null)
+                .show();
+        return true;
     }
 
     @SuppressWarnings("deprecation")

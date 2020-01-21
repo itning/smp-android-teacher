@@ -30,6 +30,7 @@ import top.itning.smpandroidteacher.R;
 import top.itning.smpandroidteacher.R2;
 import top.itning.smpandroidteacher.client.ClassClient;
 import top.itning.smpandroidteacher.client.http.HttpHelper;
+import top.itning.smpandroidteacher.client.http.RestModel;
 import top.itning.smpandroidteacher.entity.StudentClassCheckDTO;
 import top.itning.smpandroidteacher.entity.StudentClassUser;
 import top.itning.smpandroidteacher.ui.adapter.StudentCheckDetailRecyclerViewDataAdapter;
@@ -190,10 +191,18 @@ public class ClassCheckUserActivity extends AppCompatActivity implements MenuIte
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(objectResponse -> {
                                     progressDialog.dismiss();
-                                    Intent intent = new Intent();
-                                    intent.putExtra("delStudentClassUser", studentClassUser);
-                                    this.setResult(RESULT_OK, intent);
-                                    this.onBackPressed();
+                                    if (objectResponse.errorBody() != null) {
+                                        RestModel<String> restModel = HttpHelper.getRestModelFromErrorBody(objectResponse.errorBody());
+                                        if (restModel != null) {
+                                            Log.w(TAG, "错误：" + restModel.toString());
+                                            Toast.makeText(this, "错误：" + restModel.getMsg(), Toast.LENGTH_LONG).show();
+                                        }
+                                    } else {
+                                        Intent intent = new Intent();
+                                        intent.putExtra("delStudentClassUser", studentClassUser);
+                                        this.setResult(RESULT_OK, intent);
+                                        this.onBackPressed();
+                                    }
                                 }, HttpHelper.ErrorInvoke.get(this)
                                         .before(t -> progressDialog.dismiss())
                                         .orElseException(t -> {
